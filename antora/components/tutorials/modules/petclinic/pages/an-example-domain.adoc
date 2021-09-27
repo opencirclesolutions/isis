@@ -1,0 +1,126 @@
+:Notice: Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at. http://www.apache.org/licenses/LICENSE-2.0 . Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR  CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+= An Example Domain
+
+By now you should understand the basics of what Apache Isis does, but there's only so much we can learn from a one domain class.
+Let's therefore evolve the app into a slightly more interesting domain and explore other features of the framework.
+
+The domain we're going to work on is a version of the venerable "Pet Clinic" app.
+Here's a sketch of (our version of) its domain:
+
+[plantuml]
+----
+hide empty members
+hide methods
+
+skinparam class {
+	BackgroundColor<<desc>> Cyan
+	BackgroundColor<<ppt>> LightGreen
+	BackgroundColor<<mi>> LightPink
+	BackgroundColor<<role>> LightYellow
+}
+
+package pets {
+
+    enum PetSpecies <<desc>> {
+        Dog
+        Cat
+        Hamster
+        Budgerigar
+    }
+
+    class Pet <<ppt>> {
+        +id
+        ..
+        #owner
+        #name
+        ..
+        -species
+        -notes
+    }
+
+
+    class Owner <<role>> {
+        +id
+        ..
+        #lastName
+        #firstName
+        ..
+        -phoneNumber
+        -emailAddress
+    }
+}
+
+
+package visits {
+
+    class Visit <<mi>> {
+        +id
+        ..
+        #pet
+        #visitAt: LocalDateTime
+        ..
+        -reason
+        ..
+        -cost
+        -paid: boolean
+        -outcome
+    }
+}
+
+
+Owner *-down-> "0..*" Pet
+Visit "   \n*" -up->  Pet
+Pet  "*" -right--> PetSpecies
+----
+
+[TIP]
+====
+The colours used are from "Java: Modeling in Color" book by Coad et al.
+====
+
+
+Some of the use cases we might want to support include:
+
+* create an `Owner`
+* add and remove ``Pet``s for said `Owner`
+* book a `Pet` in for a `Visit`
+* enter an `outcome` and `cost` of a `Visit`
+* allow an `Owner` to pay for a `Visit`
+* find ``Visit``s not yet paid and overdue
+* delete an `Owner` and its ``Pet``s and ``Visit``s, so long as there are no unpaid ``Visit``s.
+
+This tutorial has worked solutions for all of these.
+
+== Rename `HelloWorldObject` to `Owner`
+
+To start with, let's rename the `HelloWorldObject` entity to `Owner`
+You can either make the changes yourself, or just checkout the next git tag checkpoint
+
+=== Solution
+
+[source,bash]
+----
+git checkout tags/020-rename-HelloWorldObject-to-Owner
+mvn clean package jetty:run
+----
+
+=== Exercise
+
+* the changes for `HelloWorldObject` entity are:
+
+** rename class `HelloWorldObject` -> `Owner`
+** rename file `HelloWorldObject.layout.xml` -> `Owner.layout.xml`
+** rename file `HelloWorldObject.png` -> `Owner.png`
+*** or replace with another more suitable icon
+** rename class `HelloWorldObjectTest_updateName` -> `OwnerTest_updateName`
+** rename class `HelloWorldObjectTest_delete` -> `OwnerTest_delete`
+
+* for the `HelloWorldObjects` domain service:
+
+** rename class `HelloWorldObjects` -> `Owners`
+** update file `menubars.layout.xml`
+
+Run the application and make sure it still runs fine.
+
+

@@ -1,0 +1,26 @@
+= Apache Isis - A Hands-on Tutorial
+
+:Notice: Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at. http://www.apache.org/licenses/LICENSE-2.0 . Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR  CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+This tutorial is an introduction to https://isis.apache.org[Apache Isis], and develops a variant of the venerable "pet clinic" demo app.
+
+Each exercise has complete instructions to complete, and/or you can pull down the solutions from the companion github repo:
+
+[source,bash]
+----
+git clone https://github.com/apache/isis-app-demo
+----
+
+In the menu (on the left) you'll see that certain steps have a hand symbol and a number.
+These correspond to tags in the git repo, so you can pick up the tutorial wherever you wish.
+
+
+For more information:
+
+* link:http://isis.apache.org[isis.apache.org]
+
+* link:mailto:dan@haywood-associates.co.uk[dan@haywood-associates.co.uk]
+
+* twitter: @dkhaywood
+
+

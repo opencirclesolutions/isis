@@ -1,0 +1,513 @@
+= Fleshing out the `Owner` entity
+
+:Notice: Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at. http://www.apache.org/licenses/LICENSE-2.0 . Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR  CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+
+== Rework ``Owner``'s name (`firstName` and `lastName`)
+
+In the domain we are working on, `Owner` has a `firstName` and a `lastName` property, not a single `name` property.
+Let's update `Owner` accordingly.
+
+
+=== Solution
+
+[source,bash]
+----
+git checkout tags/070-rework-Owners-name-firstName-and-lastName
+mvn clean package jetty:run
+----
+
+=== Exercise
+
+* rename property `Owner#name` -> `Owner#lastName`
+* add property `Owner#firstName`:
++
+[source,java]
+----
+@javax.jdo.annotations.Column(allowsNull = "false", length = 40)
+@Property
+@Getter @Setter
+private String firstName;
+----
+
+* update the constructor:
++
+[source,java]
+----
+public Owner(final String lastName, final String firstName) {
+    this.lastName = lastName;
+    this.firstName = firstName;
+}
+----
+
+* remove `@Title` annotation from `lastName` property, and add a `title()` method to derive from both properties:
++
+[source,java]
+----
+public String title() {
+    return getLastName() + ", " + getFirstName().substring(0,1);
+}
+----
+
+
+* update `Owner.layout.xml`
++
+[source,xml]
+----
+<c:property id="lastName" namedEscaped="true"/>
+<c:property id="firstName" namedEscaped="true">
+    <c:action id="updateName">
+        <c:describedAs>Updates the object's name</c:describedAs>
+    </c:action>
+</c:property>
+----
++
+This will place the button for `updateName` underneath the `firstName` property.
+
+* update the corresponding JDO `@Unique` annotation for `Owner`:
++
+[source,java]
+----
+@javax.jdo.annotations.Unique(name="Owner_lastName_firstName_UNQ", members = {"lastName", "firstName"})
+----
+
+* update the implementation of `Comparable` for `Owner`:
++
+[source,java]
+----
+@Override
+public int compareTo(final Owner other) {
+    return ComparisonChain.start()
+            .compare(this.getLastName(), other.getLastName())
+            .compare(this.getFirstName(), other.getFirstName())
+            .result();
+}
+----
++
+[NOTE]
+====
+The archetype includes a dependency on guava, which is where `ComparisonChain` comes from.
+====
+
+
+* update `Owner#updateName` to also accept a new `firstName` parameter:
++
+[source,java]
+----
+@Action(semantics = SemanticsOf.IDEMPOTENT, command = CommandReification.ENABLED, publishing = Publishing.ENABLED)
+public Owner updateName(
+        @Parameter(maxLength = 40)
+        final String lastName,
+        @Parameter(maxLength = 40)
+        final String firstName) {
+    setLastName(lastName);
+    setFirstName(firstName);
+    return this;
+}
+public String default0UpdateName() {
+    return getLastName();
+}
+public String default1UpdateName() {
+    return getFirstName();
+}
+----
++
+The "default" supporting methods are called when the action prompt is rendered, providing the default for the "Nth" parameter of the corresponding action.
+
+
+* update `Orders#create`:
++
+[source,java]
+----
+@Action(semantics = SemanticsOf.NON_IDEMPOTENT)
+@MemberOrder(sequence = "1")
+public Owner create(
+        @Parameter(maxLength = 40)
+        final String lastName,
+        @Parameter(maxLength = 40)
+        final String firstName) {
+    return repositoryService.persist(new Owner(lastName, firstName));
+}
+----
+
+* update `Orders#findByName` to search across either the `firstName` or the `lastName`:
++
+[source,java]
+----
+@Action(semantics = SemanticsOf.SAFE)
+@MemberOrder(sequence = "2")
+public List<Owner> findByName(
+        final String name) {
+    TypesafeQuery<Owner> q = isisJdoSupport.newTypesafeQuery(Owner.class);
+    final QOwner cand = QOwner.candidate();
+    q = q.filter(
+            cand.lastName.indexOf(q.stringParameter("name")).ne(-1).or(
+            cand.firstName.indexOf(q.stringParameter("name")).ne(-1)
+            )
+    );
+    return q.setParameter("name", name)
+            .executeList();
+}
+----
+
+* update test class `OwnerTest_updateName`
+* update test class `OwnerTest_delete`
+
+
+
+== Derived name property
+
+The ``Owner``'s `firstName` and `lastName` properties are updated using the `updateName` action, but when the action's button is invoked, it only "replaces" the `firstName` property:
+
+image::{_imagesdir}/Owner-updateName-prompt.png[width="400px",link="_images/Owner-updateName-prompt.png"]
+
+We can improve this by introducing a derived `name` property and then hiding the `firstName` and `lastName`:
+
+image::{_imagesdir}/Owner-name.png[width="400px",link="_images/Owner-name.png"]
+
+And, when `Owner#updateName` is invoked, the prompt we'll see is:
+
+image::{_imagesdir}/Owner-name-updated.png[width="400px",link="_images/Owner-name-updated.png"]
+
+
+
+=== Solution
+
+[source,bash]
+----
+git checkout tags/080-derived-name-property
+mvn clean package jetty:run
+----
+
+=== Exercise
+
+* Add `getName()` as the derived `name` property:
++
+[source,java]
+----
+@Property(notPersisted = true)
+public String getName() {
+    return getFirstName() + " " + getLastName();
+}
+----
+
+* Hide the `firstName` and `lastName` properties, using `@Property(hidden=...)`:
++
+[source,java]
+----
+@javax.jdo.annotations.Column(allowsNull = "false", length = 40)
+@Property(hidden = Where.EVERYWHERE)
+@Getter @Setter
+private String lastName;
+----
+
+
+* Update the `Owner.layout.xml` layout file:
++
+[source,xml]
+----
+<c:property id="name" namedEscaped="true">
+    <c:action id="updateName">
+        <c:describedAs>Updates the object's name</c:describedAs>
+    </c:action>
+</c:property>
+----
+
+
+== Digression: Changing the App Name
+
+Let's remove the remaining vestiges of the "hello world" archetype, and rename our application to "pet clinic".
+
+=== Solution
+
+[source,bash]
+----
+git checkout tags/090-digression-changing-the-app-name
+mvn clean package jetty:run
+----
+
+=== Exercise
+
+Rename:
+
+* `HelloWorldModule` -> `PetClinicModule`
+
+* `HelloWorldApplication` -> `PetClinicApplication`
+
+** Also update the string literals in `newIsisWicketModule()` method
+** Also update the reference to the application class in `web.xml`.
+
+* `HelloWorldAppManifest` -> `PetClinicAppManifest`
+
+** Also update `isis.appManifest` property in the `isis.properties` file
+
+* various text references to "Hello World" or "HelloWorld" literals in `pom.xml`, `index.html` and `welcome.html` files
+
+
+== Changing the "Object Type" Class Alias
+
+The Apache Isis framework allows an optional alias to be specified for each domain class; this is called the "objectType".
+This crops up in various places, including the `menubars.layout.xml`, and the REST API.
+It can used when persisting data, eg to hold a reference to an arbitrary domain object (a "polymorphic association").
+
+It's good practice to specify an object type, because it makes refactoring easier if we subsequently move the class to another package, or rename it.
+
+
+=== Solution
+
+[source,bash]
+----
+git checkout tags/100-changing-the-object-type-class-alias
+mvn clean package jetty:run
+----
+
+=== Exercise
+
+* Update `Owners` domain service.
+The object type alias is specified in `@DomainService(objectType=...)`:
++
+[source,java]
+----
+@DomainService(
+        nature = NatureOfService.VIEW_MENU_ONLY,
+        objectType = "pets.Owners"
+)
+public class Owners { ... }
+----
+
+* Update `Owner` domain entity.
+The object type alias is derived from the database schema and the class's (simple) name:
++
+[source,java]
+----
+@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE, schema = "pets" )
+...
+public class Owner implements Comparable<Owner> { ... }
+----
+
+* also, update `menubars.layout.xml`, changing "myapp.Owners" to "pets.Owners".
+
+
+== Add other properties for `Owner`
+
+Let's add the two remaining properties for `Owner`.
+
+[plantuml]
+----
+hide empty members
+hide methods
+
+class Owner {
+    +id
+    ..
+    #lastName
+    #firstName
+    ..
+    -phoneNumber
+    -emailAddress
+}
+----
+
+=== Solution
+
+[source,bash]
+----
+git checkout tags/110-add-other-properties-for-Owner
+mvn clean package jetty:run
+----
+
+=== Exercise
+
+* Add `phoneNumber` as an editable property and use a regex to limit the allowed characters:
++
+[source,java]
+----
+@javax.jdo.annotations.Column(allowsNull = "true", length = 15)
+@Property(
+        editing = Editing.ENABLED,
+        regexPattern = "[+]?[0-9 ]+",
+        regexPatternReplacement =
+            "Specify only numbers and spaces, optionally prefixed with '+'.  " +
+            "For example, '+353 1 555 1234', or '07123 456789'"
+)
+@Getter @Setter
+private String phoneNumber;
+----
++
+Until we update `Owner.layout.xml`, then the new property will be added to the section specified `unreferencedProperties="true"`, in other words a field set called "Other".
+
+* Add `emailAddress` as an editable property and use a supporting `validate` method to verify the format:
++
+[source,java]
+----
+@javax.jdo.annotations.Column(allowsNull = "true", length = 50)
+@Property(editing = Editing.ENABLED)
+@Getter @Setter
+private String emailAddress;
+public String validateEmailAddress(String emailAddress) {
+    return emailAddress.contains("@") ? null : "Email address must contain a '@'";
+}
+----
++
+Obviously in this previous case we could also have used a declarative approach, but using a "validate" method here shows that arbitrary logic can be used.
+For example, we could delegate to an injected domain service to actually validate the email.
+
+* update `Owner.layout.xml`.
++
+While we are at it, we could move the `notes` property to its own tab:
++
+[source,xml]
+----
+<bs3:tab name="Contact Details">
+    <bs3:row>
+        <bs3:col span="12">
+            <c:fieldSet name="Contact Details">
+                <c:property id="emailAddress"/>
+                <c:property id="phoneNumber"/>
+            </c:fieldSet>
+        </bs3:col>
+    </bs3:row>
+</bs3:tab>
+<bs3:tab name="Notes">
+    <bs3:row>
+        <bs3:col span="12">
+            <c:fieldSet name="Notes">
+                <c:property id="notes" namedEscaped="true" multiLine="10" hidden="ALL_TABLES"/>
+            </c:fieldSet>
+        </bs3:col>
+    </bs3:row>
+</bs3:tab>
+----
++
+resulting in:
+
+image::{_imagesdir}/Owner-with-contact-details.png[width="600px",link="_images/Owner-with-contact-details.png"]
+
+
+== Using specifications to encapsulate business rules
+
+When we create a new `Owner` we specify only the first and last name.
+If the owner has a phone number, then the user has to edit that property separately.
+
+Suppose we wanted to allow the user to optionally enter the phone number when the `Owner` is first created?
+That would require extending the `Owners#create(...)` action to also accept an optional "phoneNumber" parameter.
+
+However, the regex validation rule that we've specified on `Owner#phoneNmber` will need duplicating for the `phoneNumber` parameter; the framework doesn't "know" that the value is to be used to populate that particular property.
+But duplicating validation violates the single responsibility principle.
+
+Instead, we can move the validation logic into a "specification", and associate both the property and the parameter with that specification.
+
+=== Solution
+
+[source,bash]
+----
+git checkout tags/120-using-specifications-to-encapsulate-business-rules
+mvn clean package jetty:run
+----
+
+=== Exercise
+
+* factor out a `PhoneNumberSpec`:
++
+[source,java]
+----
+public static class PhoneNumberSpec extends AbstractSpecification<String> {
+    @Override
+    public String satisfiesSafely(final String phoneNumber) {
+        Matcher matcher = Pattern.compile("[+]?[0-9 ]+").matcher(phoneNumber);
+        return matcher.matches() ? null :
+                "Specify only numbers and spaces, optionally prefixed with '+'.  " +
+                "For example, '+353 1 555 1234', or '07123 456789'";
+    }
+}
+----
++
+[TIP]
+====
+In this case it isn't required, but we could if we wanted inject domain services into this specification class.
+====
+
+* refactor the `phoneNumber` property to use this spec:
++
+[source,java]
+----
+@javax.jdo.annotations.Column(allowsNull = "true", length = 15)
+@Property(editing = Editing.ENABLED,
+        mustSatisfy = PhoneNumberSpec.class
+)
+@Getter @Setter
+private String phoneNumber;
+----
+
+* extend the `Orders#create` action to also extend a `phoneNumber` parameter, and use the `PhoneNumberSpec` to implement the same business rule:
++
+image::{_imagesdir}/Owners-create-with-phoneNumber.png[width="400px",link="_images/Owners-create-with-phoneNumber.png"]
++
+using this code:
++
+[source,java]
+----
+@Action(semantics = SemanticsOf.NON_IDEMPOTENT)
+@MemberOrder(sequence = "1")
+public Owner create(
+        @Parameter(maxLength = 40)
+        final String lastName,
+        @Parameter(maxLength = 40)
+        final String firstName,
+        @Parameter(
+                mustSatisfy = Owner.PhoneNumberSpec.class,
+                maxLength = 15,
+                optionality = Optionality.OPTIONAL
+        )
+        final String phoneNumber) {
+    Owner owner = new Owner(lastName, firstName);
+    owner.setPhoneNumber(phoneNumber);
+    return repositoryService.persist(owner);
+}
+----
+
+
+[NOTE]
+====
+The above refactoring isn't perfect: there is still some repetition of the length of the property/parameter, for example.
+
+The next version of the framework will support custom meta-annotations which will address this.
+Then, you'll be able to write:
+
+[source,java]
+----
+@javax.jdo.annotations.Column(allowsNull = "true", length = 15)
+@Property(
+    mustSatisfy = Owner.PhoneNumberSpec.class
+)
+@Parameter(
+    mustSatisfy = Owner.PhoneNumberSpec.class,
+    maxLength = 15,
+    optionality = Optionality.OPTIONAL
+)
+public @interace @PhoneNumber {}
+----
+
+and then:
+
+[source,java]
+----
+@PhoneNumber
+@Getter @Setter
+private String phoneNumber;
+----
+
+and
+
+[source,java]
+----
+public Owner create(
+        final String lastName,
+        final String firstName,
+        @PhoneNumber
+        final String phoneNumber) { ... }
+----
+
+====
+
+

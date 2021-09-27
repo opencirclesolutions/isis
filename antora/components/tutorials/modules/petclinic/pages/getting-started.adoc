@@ -1,0 +1,363 @@
+= Getting Started
+
+:Notice: Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at. http://www.apache.org/licenses/LICENSE-2.0 . Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR  CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+== Prereqs
+
+You'll need:
+
+* Java 8
++
+Apache Isis hasn't yet been tested for later versions of Java; the next major version of the framework will target Java 11.
+
+* Maven 3.x
++
+Maven 3.5.0 or later is recommended (for its CI/CD support), but you'll get by okay with earlier versions.
+
+Also recommended:
+
+* a Java IDE with support for Maven.
++
+The Apache Isis website has detailed documentation for using IntelliJ and Eclipse.
+
+* git
++
+The tutorial includes worked example/solution, provided in a github-hosted repo.
+This has multiple tags for the various checkpoints.
+If you want to work from the solution, you'll need git to pull down the version.
+
+
+== Generate
+
+Use the "Hello World" Maven archetype to generate a running app (adjust `groupId` and `artifactId` as necessary):
+
+[source,bash]
+----
+mvn archetype:generate  \
+    -D archetypeGroupId=org.apache.isis.archetype \
+    -D archetypeArtifactId=helloworld-archetype \
+    -D archetypeVersion=1.16.2 \
+    -D groupId=com.mycompany \
+    -D artifactId=myapp \
+    -D version=1.0-SNAPSHOT \
+    -B
+
+cd myapp
+----
+
+Build and run:
+
+[source,bash]
+----
+mvn clean package jetty:run
+----
+
+and then browse to http://localhost:8080[]:
+
+image::{_imagesdir}/index.png[width="800px",link="_images/index.png"]
+
+
+
+== Explore the Generated App
+
+Although there's the archetype doesn't generated much code, there's still plenty to explore.
+
+=== Wicket viewer
+
+Follow the "wicket" link and logon using `sven/pass`.
+
+image::{_imagesdir}/home-page.png[width="800px",link="_images/home-page.png"]
+
+Use the "Hello World Objects" menu:
+
+image::{_imagesdir}/hello-world-objects-menu.png[width="300px",link="_images/hello-world-objects-menu.png"]
+
+to:
+
+
+* create new objects
+* search by name
+* list all objects
++
+Note that "list all" is in italics.
+That's because this is a so-called "prototype" action; it's only available when running in prototype (development) mode.
+
+On an object:
+
+image::{_imagesdir}/object-a.png[width="800px",link="_images/object-a.png"]
+
+perform the following:
+
+* update its name
+* delete the object
+* create two objects with the same name
+
+Use the "Prototyping" menu:
+
+image::{_imagesdir}/prototyping-menu.png[width="300px",link="_images/prototyping-menu.png"]
+
+to access various built-in functionality.
+For example, use "HSQL DB Manager" to launch a Swing UI to browse the backend database (we use HSQL DB running in-memory when prototyping).
+Note that we'll be exploring the Swagger UI/REST API) below.
+
+Use the tertiary menu (with the user's name) to view the application's configuration settings and to logout:
+
+image::{_imagesdir}/tertiary-menu.png[width="250px",link="_images/tertiary-menu.png"]
+
+
+Use the bookmarks page (top left strip or `alt-[` ) to access previously visited domain objects.
+Use the drop-down menu on the bottom footer as an alternative mechanism.
+
+
+=== Restful Objects (Swagger)
+
+Navigate back to http://localhost:8080[], and follow the "swagger-ui" link.
+Enter `sven/pass` and "prototyping", then reload:
+
+image::{_imagesdir}/swagger-ui.png[width="800px",link="_images/swagger-ui.png"]
+
+Use the Swagger UI to interact with the domain objects previously created in the Wicket viewer.
+
+For example, follow link:http://localhost:8080/swagger-ui/index.html#!/myapp/get_services_myapp_HelloWorldObjects_actions_listAll_invoke[/services/myapp.HelloWorldObjects/actions/listAll/invoke] to list all domain objects.
+
+Use the "Response Content Type" drop-down to obtain different representations of the list.
+
+
+== Pull down github example/solution
+
+This tutorial has an accompanying github repo with multiple tags for the various checkpoints; the first tag is immediately after creating the archetype.
+We recommend that you pull this down so that - even if you code up all the steps yourself - you can easily get back to a working application if needs be.
+
+To pull down the example:
+
+[source,bash]
+----
+git clone https://github.com/danhaywood/isis-petclinic-tutorial
+----
+
+and then checkout the first tag:
+
+[source,bash]
+----
+git checkout tags/010-pull-down-github-example-solution
+mvn clean package jetty:run
+----
+
+You can now run the app.
+If necessary, switch into the "myapp" directory:
+
+[source,bash]
+----
+cd myapp
+----
+
+and run using:
+
+[source,bash]
+----
+mvn clean package jetty:run
+----
+
+
+== Set up your dev env
+
+Rather than running and editing from the Maven command line, we recommend that you load the application into an IDE and run from there.
+
+[TIP]
+====
+Admittedly, there is 5 or 10 minutes of setup required here.
+
+If you are short of time then you might want to skip this and instead just run the solutions by checking out the various tags and run using "mvn clean package jetty:run".
+
+Do though use an an editor that lets you easily locate files in the filesystem.
+====
+
+
+=== Loading the project
+
+Assuming that you _are_ going to use a mainstream IDE, the first bit is to load the files into the IDE.
+All of the mainstream IDEs make this easy to do: generally open Maven projects just by navigating to the `pom.xml`.
+For example, here's the generated app loaded into IntelliJ:
+
+image::{_imagesdir}/project-loaded-into-intellij.png[width="300px",link="_images/project-loaded-into-intellij.png"]
+
+=== Compiling the app
+
+DataNucleus includes an annotation processor, so make sure that annotation processing is enabled on the Maven project.
+
+The other very important thing you do need to know is that Apache Isis leverages DataNucleus for its ORM, and this uses bytecode enhancement rather than runtime proxies (it being an implementation of the JDO API as well as JPA).
+The DataNucleus bytecode enhancer runs after the compiler but (of course) before the app runs.
+
+* When using the Maven command line, the `datanucleus-maven-plugin` is bound to the `postCompile` phase.
+So, a simple "mvn package jetty:run" suffices to build the code, run the enhancer and to run the actual app.
+
+* When compiling with IntelliJ, there's nothing specific we need to configure to ensure that domain entity clases are enhanced.
+Because IntelliJ "watches" the filesystem for external changes, we can simply leverage Maven to perform the enhancement just prior to running the app.
+More on this in the next section.
+
+* When building in Eclipse, it is necessary to hook into the compile phase to ensure that the enhancement occurs; this is done by installing an Eclipse plugin which runs the datanucleus enhancer.
++
+This is necessary because Eclipse -- unlike IntelliJ -- isn't designed to continually watch the filesystem; any changes to the class files must be made through its "internal" processes.
++
+Nevertheless, datanucleus's Eclipse plugin generally works as well as the Maven plugin.
+
+For more info, see the Apache Isis developers' guide for more detailed instructions when using http://isis.apache.org/guides/dg/dg.html#_dg_ide_intellij[IntelliJ] or
+http://localhost:4000/guides/dg/dg.html#_dg_ide_eclipse[Eclipse].
+
+=== Running the app
+
+When running from the IDE, it's easiest to run using framework-provided bootstrap class, namely `org.apache.isis.WebServer`.
+This is just a regular application class (with a `main(...)` method) that uses Jetty to run the app (similar to the way in which Spring Boot works, for example).
+
+If using IntelliJ, we've found it easiest to set up a _run configuration_ with the "Before launch, run Maven goal" property set up to run the datanucleus enhancer:
+
+image::{_imagesdir}/intellij-run-configuration.png[width="800px",link="_images/intellij-run-configuration.png"]
+
+with
+
+image::{_imagesdir}/intellij-run-configuration-before-launch-datanucleus-enhance.png[width="400px",link="_images/intellij-run-configuration-before-launch-datanucleus-enhance.png"]
+
+The command being run here (in the appropriate directory) is simply:
+
+[source,bash]
+----
+mvn datanucleus:enhance -o
+----
+
+
+
+Alternatively the app can be deployed to an app server such as Tomcat (8.x); all the usual files in `src/main/webapp` are there.
+
+
+
+== Naked Objects pattern
+
+Apache Isis is an implementation of the _naked objects pattern_.
+This means that there's a direct mapping from the domain object model into the UI.
+We can explore this by looking at the domain entity and domain service generated by the archetype.
+
+[TIP]
+====
+An ORM such as DataNucleus or Hibernate maps domain objects into an RDBMS or other datastore.
+You can think of Apache Isis (and naked objects) similarly, but it's an OIM - an object _interface_ mapper.
+It maps to the UI layer rather than the persistence layer.
+
+Common to both ORMs and OIMs is an internal metamodel; this is where much of the power comes from.
+====
+
+
+Navigate to `HelloWorldObjects`; this is a singleton domain service automatically instantiated by the framework.
+It corresponds to the "Hello World Objects" menu.
+
+The menu items correspond to the actions of this class:
+
+image::{_imagesdir}/HelloWorldObjects.png[width="800px",link="_images/HelloWorldObjects.png"]
+
+
+The actions of that service are used to create and persist instances of `HelloWorldObject`.
+The structure and behaviour of this domain entity are similarly reflected:
+
+image::{_imagesdir}/HelloWorldObject.png[width="800px",link="_images/HelloWorldObject.png"]
+
+It's common for each entity (or more precisely, aggregate root) to have a corresponding domain service, acting as its repository.
+This abstraction hides the details of interacting with the persistence data store.
+Domain services are automatically injected wherever they are required, using `@javax.inject.Inject`.
+
+Apache Isis applications therefore generally follow the _hexagonal architecture_ (aka the _ports and adapters_ architecture).
+
+As well as writing our own domain services, there are also many framework-provided domain services, including `RepositoryService` (to persist objects) and `IsisJdoSupport` (for type-safe queries against the database).
+But this is just the tip of the iceberg; see Apache Isis documentation (specifically: link:http://isis.apache.org/guides/rgsvc/rgsvc.html[Reference Guide: Domain Services]) for the full list.
+
+If there is more than one implementation available, declare a `List<SomeDomainService>` and all of the available services will be injected.
+They are sorted by `@DomainService#menuOrder` attribute.
+
+It's also possible to override/decorate any of the framework-provided services; just implement the same type with a lower `@DomainService#menuOrder`.
+
+Domain services also act as extension points for the framework.
+For example, custom auditing and event publishing can be provided by providing an implementation of the appropriate SPI interface.
+
+
+== UI Hints
+
+The framework derives as much of the UI as possible from the domain objects' intrinsic structure and behaviour, but there are some supporting structures and conventions that are there primarily to improve the UI.
+
+
+=== Titles
+
+A title is the identifier of a domain object for the end-user.
+
+For `HelloWorldObject`, this is defined declaratively:
+
+[source,java]
+----
+@Title(prepend = "Object: ")
+private String name;
+----
+
+It can also be specified imperatively using either the `title()` or `toString()` method.
+
+*Mini-Exercise*:
+
+(No solution is provided for this exercise).
+
+* replace the `@Title` annotation with a `title()` method:
++
+[source,java]
+----
+public String title() {
+    return "Object: " + getName();
+}
+----
+
+
+
+See link:http://isis.apache.org/guides/rgcms/rgcms.html#_rgcms_methods_reserved_title[Reference Guide: Classes, Methods and Schema] for more details.
+
+=== Object layout
+
+Frameworks that implement the _naked objects pattern_ automatically provide a default representation of domain objects.
+In many cases the details of that representation can be inferred directly from the domain members.
+For example the label of a field for an object's property (eg `HelloWorldObject#name`) can be derived directly from the name of the object property itself (`getName()`).
+
+In the absence of other metadata, Apache Isis will render a domain object with the properties to the left-hand side and the collections (if any) to the right.
+The order of these properties can be specified using the `@MemberOrder` annotation, and there are other annotations to group properties together and to associate action buttons with either properties or collections.
+
+The downside of using annotations is that changing the layout requires that the application be restarted, and certain more complex UIs, such as multi-columns or tab groups are difficult or impossible to express.
+
+Therefore Apache Isis also allows the layout of domain objects to be specified using a complementary layout file, eg `HelloWorldObject.layout.xml`.
+This is modelled upon bootstrap and so supports arbitrary rows and columns as well as tab groups and tabs.
+
+*Mini-Exercise*:
+
+* locate the `HelloWorldObject.layout.xml` file
+* compare the structure of the layout file to that of the rendered object
+* change the file, eg the relative widths of the columns
+* use the IDE to copy over the file to the classpath; the new version will be picked up automatically
+** for example, with IntelliJ use `Run > Reload Changed Classes`
+
+To learn more, see the link:http://isis.apache.org/guides/ugvw/ugvw.html#_ugvw_layout_file-based[Wicket viewer guide] (file-based layout).
+
+
+=== Icons
+
+Each domain object is associated with an icon.
+Typically this is static and in the same package as the class; see `HelloWorldObject.png`.
+
+
+=== menubars.layout.xml
+
+In a similar fashion, the actions of the various domain services are grouped into menus using the `menubars.layout.xml` file.
+
+*Mini-Exercise*:
+
+* locate the `menubars.layout.xml` file
+* compare the structure of the layout file to that of the rendered menu bar
+* change the file, eg reorder menu items or create new menus
+* again, use the IDE to copy over the file to the classpath
+** for example, with IntelliJ use `Run > Reload Changed Classes`
+
+
+To learn more, see the link:http://localhost:4000/guides/ugvw/ugvw.html#_ugvw_menubars-layout[Wicket viewer guide] (menu bars layout).
+
+
+
