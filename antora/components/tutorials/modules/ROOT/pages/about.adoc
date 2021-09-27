@@ -6,6 +6,6 @@
 
 This page catalogues the tutorials available to help you learn Apache Isis.
 
-* xref:tutorials:petclinic:about.adoc[Petclinic]
+* xref:petclinic:about.adoc[Petclinic]
 +
-A take on the classic petclinc application
+A take on the classic petclinic application

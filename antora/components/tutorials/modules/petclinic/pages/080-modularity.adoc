@@ -231,7 +231,7 @@ We also have the issue that we can't actually access the ``Visit``s once they ha
 An obvious place to see them would probably be from the `Pet`.
 Similar to the "bookVisit" contributed action, we can also contribute a "visits" collection:
 
-image::{_imagesdir}/Pet-visits-collection.png[width="800px",link="_images/Pet-visits-collection.png"]
+image::Pet-visits-collection.png[width="800px",link="_images/Pet-visits-collection.png"]
 
 === Solution
 

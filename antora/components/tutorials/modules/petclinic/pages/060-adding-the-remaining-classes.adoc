@@ -13,15 +13,15 @@ Let's start by tackling one side of this, from `Pet` to `Owner`.
 
 * We'll add a new action to create a new `Pet` from an `Owner`:
 +
-image::{_imagesdir}/owner-newPet.png[width="400px",link="_images/owner-newPet.png"]
+image::owner-newPet.png[width="400px",link="_images/owner-newPet.png"]
 +
 which will prompt for the name and species of the `Pet`:
 +
-image::{_imagesdir}/owner-newPet-prompt.png[width="400px",link="_images/owner-newPet-prompt.png"]
+image::owner-newPet-prompt.png[width="400px",link="_images/owner-newPet-prompt.png"]
 
 * and, when the `Pet` is returned, it will be associated with the `Owner` that created it:
 +
-image::{_imagesdir}/Pet.png[width="600px",link="_images/Pet.png"]
+image::Pet.png[width="600px",link="_images/Pet.png"]
 
 === Solution
 
@@ -166,7 +166,7 @@ At this point in our app, although the `Pet` knows its `Owner`, the opposite isn
 
 Our design says we'd like this to be a bidirectional 1-to-many association:
 
-image::{_imagesdir}/Owner-pets.png[width="800px",link="_images/Owner-pets.png"]
+image::Owner-pets.png[width="800px",link="_images/Owner-pets.png"]
 
 Let's add in the `Owner#pets` collection:
 
@@ -322,11 +322,11 @@ protected void execute(final ExecutionContext ec) {
 Our final entity is `Visit`.
 Let's extend our app to allow ``Visit``s to be booked from an ``Owner``'s ``Pet``:
 
-image::{_imagesdir}/Pet-bookVisit-prompt.png[width="800px",link="_images/Pet-bookVisit-prompt.png"]
+image::Pet-bookVisit-prompt.png[width="800px",link="_images/Pet-bookVisit-prompt.png"]
 
 returning
 
-image::{_imagesdir}/Visit.png[width="800px",link="_images/Visit.png"]
+image::Visit.png[width="800px",link="_images/Visit.png"]
 
 
 

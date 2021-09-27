@@ -159,15 +159,15 @@ public List<Owner> findByName(
 
 The ``Owner``'s `firstName` and `lastName` properties are updated using the `updateName` action, but when the action's button is invoked, it only "replaces" the `firstName` property:
 
-image::{_imagesdir}/Owner-updateName-prompt.png[width="400px",link="_images/Owner-updateName-prompt.png"]
+image::Owner-updateName-prompt.png[width="400px",link="_images/Owner-updateName-prompt.png"]
 
 We can improve this by introducing a derived `name` property and then hiding the `firstName` and `lastName`:
 
-image::{_imagesdir}/Owner-name.png[width="400px",link="_images/Owner-name.png"]
+image::Owner-name.png[width="400px",link="_images/Owner-name.png"]
 
 And, when `Owner#updateName` is invoked, the prompt we'll see is:
 
-image::{_imagesdir}/Owner-name-updated.png[width="400px",link="_images/Owner-name-updated.png"]
+image::Owner-name-updated.png[width="400px",link="_images/Owner-name-updated.png"]
 
 
 
@@ -381,7 +381,7 @@ While we are at it, we could move the `notes` property to its own tab:
 +
 resulting in:
 
-image::{_imagesdir}/Owner-with-contact-details.png[width="600px",link="_images/Owner-with-contact-details.png"]
+image::Owner-with-contact-details.png[width="600px",link="_images/Owner-with-contact-details.png"]
 
 
 == Using specifications to encapsulate business rules
@@ -441,7 +441,7 @@ private String phoneNumber;
 
 * extend the `Orders#create` action to also extend a `phoneNumber` parameter, and use the `PhoneNumberSpec` to implement the same business rule:
 +
-image::{_imagesdir}/Owners-create-with-phoneNumber.png[width="400px",link="_images/Owners-create-with-phoneNumber.png"]
+image::Owners-create-with-phoneNumber.png[width="400px",link="_images/Owners-create-with-phoneNumber.png"]
 +
 using this code:
 +

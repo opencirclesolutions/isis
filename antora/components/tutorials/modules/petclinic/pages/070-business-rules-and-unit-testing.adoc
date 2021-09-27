@@ -11,7 +11,7 @@ In this part of the tutorial we'll cover unit testing, later on we'll look at in
 By way of motivation, let's consider a small enhancement we could make to the app.
 For example, it would improve the usability if the app automatically suggesting a time for a new `Visit` that was in the future (say tomorrow, at 9am):
 
-image::{_imagesdir}/Pet-bookVisit-prompt-with-default.png[width="800px",link="_images/Pet-bookVisit-prompt-with-default.png"]
+image::Pet-bookVisit-prompt-with-default.png[width="800px",link="_images/Pet-bookVisit-prompt-with-default.png"]
 
 [NOTE]
 ====
@@ -124,7 +124,7 @@ All configured expectations are also automatically verified.
 It doesn't really make sense to book a visit in the past.
 Let's fix that with some validation:
 s
-image::{_imagesdir}/Pet-bookVisit-prompt-with-validate.png[width="800px",link="_images/Pet-bookVisit-prompt-with-validate.png"]
+image::Pet-bookVisit-prompt-with-validate.png[width="800px",link="_images/Pet-bookVisit-prompt-with-validate.png"]
 
 === Solution
 

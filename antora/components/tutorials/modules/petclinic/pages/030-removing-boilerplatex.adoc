@@ -89,7 +89,7 @@ mvn clean package jetty:run
 +
 For example, in IntelliJ:
 +
-image::{_imagesdir}/intellij-java-compiler-parameters.png[width="800px",link="_images/intellij-java-compiler-parameters.png"]
+image::intellij-java-compiler-parameters.png[width="800px",link="_images/intellij-java-compiler-parameters.png"]
 
 * in the `pom.xml`, add the following to `<dependencies>`:
 +

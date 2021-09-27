@@ -17,7 +17,7 @@ Moreover, we'll make this the home page so that it is automatically shown when t
 
 Our end result is:
 
-image::{_imagesdir}/dashboard.png[width="800px",link="_images/dashboard.png"]
+image::dashboard.png[width="800px",link="_images/dashboard.png"]
 
 
 === Solution

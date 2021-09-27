@@ -83,15 +83,15 @@ public class PetClinicFixtureScriptSpecProvider
 
 This now provides us with a _Run Fixture Script_ menu item under the _Prototyping_ menu:
 
-image::{_imagesdir}/run-fixture-script-menu-item.png[width="250px",link="_images/run-fixture-script-menu-item.png"]
+image::run-fixture-script-menu-item.png[width="250px",link="_images/run-fixture-script-menu-item.png"]
 
 from which we can select the _Order Fixture Script_:
 
-image::{_imagesdir}/run-fixture-script-prompt.png[width="400px",link="_images/run-fixture-script-prompt.png"]
+image::run-fixture-script-prompt.png[width="400px",link="_images/run-fixture-script-prompt.png"]
 
 When invoked this shows the three `Order` domain objects just created:
 
-image::{_imagesdir}/run-fixture-script-result.png[width="800px",link="_images/run-fixture-script-result.png"]
+image::run-fixture-script-result.png[width="800px",link="_images/run-fixture-script-result.png"]
 
 
 == Run with a different manifest
@@ -183,7 +183,7 @@ public class PetClinicAppManifestWithFixture
 +
 for example:
 +
-image::{_imagesdir}/extended-manifest-run-configuration.png[width="800px",link="_images/extended-manifest-run-configuration.png"]
+image::extended-manifest-run-configuration.png[width="800px",link="_images/extended-manifest-run-configuration.png"]
 
 When you run the application, the fixture should have run already and so there should be some ``Owner`` instances.
 

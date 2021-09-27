@@ -27,7 +27,7 @@ In this section we'll implement the missing functionality, along with unit or in
 
 An outcome for a `Visit` consists of a diagnosis, and also the cost to be paid by the ``Pet``'s `Owner`.
 
-image::{_imagesdir}/Visit-enterOutcome.png[width="800px",link="_images/Visit-enterOutcome.png"]
+image::Visit-enterOutcome.png[width="800px",link="_images/Visit-enterOutcome.png"]
 
 === Solution
 
@@ -326,7 +326,7 @@ git checkout tags/360-find-visits-not-yet-paid-and-overdue
 mvn clean package jetty:run
 ----
 
-image::{_imagesdir}/Dashboard-overdue.png[width="800px",link="_images/Dashboard-overdue.png"]
+image::Dashboard-overdue.png[width="800px",link="_images/Dashboard-overdue.png"]
 
 === Exercise
 
@@ -432,7 +432,7 @@ We could improve the dashboard a little.
 After all, in the "overdue" collection there's no point in showing the "paidOn"; the value will always be null.
 Also, the "reason" column is also somewhat superfluous (as, arguably, is the "diagnosis" column):
 
-image::{_imagesdir}/Dashboard-overdue-ui-hints.png[width="800px",link="_images/Dashboard-overdue-ui-hints.png"]
+image::Dashboard-overdue-ui-hints.png[width="800px",link="_images/Dashboard-overdue-ui-hints.png"]
 
 The framework offers two different ways to address this, so we'll show both.
 
@@ -497,11 +497,11 @@ This returns a simple string that is added as a CSS class wherever the object is
 
 In this exercise we'll use a different icon for the various species of `Pet`:
 
-image::{_imagesdir}/Pet-icons.png[width="800px",link="_images/Pet-icons.png"]
+image::Pet-icons.png[width="800px",link="_images/Pet-icons.png"]
 
 Let's also use a strike-through text for all ``Visit``s that are paid when rendered within a collection:
 
-image::{_imagesdir}/Visits-paid-strikethrough.png[width="800px",link="_images/Visits-paid-strikethrough.png"]
+image::Visits-paid-strikethrough.png[width="800px",link="_images/Visits-paid-strikethrough.png"]
 
 
 
