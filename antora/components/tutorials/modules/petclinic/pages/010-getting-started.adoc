@@ -34,7 +34,7 @@ Apache Isis provides a two starter apps, xref:docs:starters:helloworld.adoc[Hell
 These are identical in terms of functionality, but the simpleapp provides more structure and includes example tests.
 
 NOTE: there are JPA and JDO variants of the starter apps.
-This tutorial uses JPA as it is more commonly used.
+This tutorial uses JPA as it is the more commonly used persistence mechanism.
 
 We start the tutorial simply with a copy of xref:docs:starters:simpleapp.adoc[SimpleApp]; in subsequent exercises we'll refactor and build upon it to morph it into the petclinic domain.
 
@@ -45,6 +45,10 @@ We start the tutorial simply with a copy of xref:docs:starters:simpleapp.adoc[Si
 ----
 git clone https://github.com/apache/isis-app-demo
 ----
+
+* (optional) Load the git repo into a GUI tool such as SourceTree or GitKraken
++
+This will make it easier to inspect differences between different tags.
 
 * Checkout the first tag, and build:
 +
@@ -60,6 +64,8 @@ mvn clean install
 ----
 mvn -pl webapp spring-boot:run
 ----
+
+
 
 
 == Exercise 1.2: Explore the Simple App
@@ -93,7 +99,7 @@ If you want to go deeper, open up the xref:docs:starters:simpleapp.adoc[page des
 
 
 
-== Naked Objects pattern
+== Exercise 1.4: Naked Objects pattern
 
 Apache Isis is an implementation of the _naked objects pattern_, which means that entities (and later, as we'll see view models) are automatically exposed in the UI.
 
@@ -128,7 +134,7 @@ As well as writing our own domain services, there are also many framework-provid
 See the xref:refguide:applib-svc:about.adoc[Reference Guide: Domain Services] docs for the full list.
 
 
-== UI Hints
+== Exercise 1.5: UI Hints
 
 The framework derives as much of the UI as possible from the domain objects' intrinsic structure and behaviour, but there are some supporting structures and conventions that are there primarily to improve the UI.
 
@@ -190,7 +196,7 @@ This is modelled upon bootstrap and so supports arbitrary rows and columns as we
 * compare the structure of the layout file to that of the rendered object
 * change the file, eg the relative widths of the columns
 * use the IDE to copy over the file to the classpath; the new version will be picked up automatically
-** for example, with IntelliJ use menu:Run[Reload Changed Classes].
+** for example, with IntelliJ use menu:Run[Debugging Actions > Reload Changed Classes].
 
 
 You can learn more about file-based layouts in the fundamentals guide describing at xref:userguide:fun:ui.adoc#object-layout[Object Layout]s.
@@ -210,7 +216,7 @@ In a similar fashion, the actions of the various domain services are grouped int
 * compare the structure of the layout file to that of the rendered menu bar
 * change the file, eg reorder menu items or create new menus
 * again, use the IDE to copy over the file to the classpath
-** for example, with IntelliJ use menu:Run[Reload Changed Classes]/
+** for example, with IntelliJ use menu:Run[Debugging Actions > Reload Changed Classes]/
 
 
 To learn more, see the section of the fundamentals guide describing xref:userguide:fun:ui.adoc#file-based-menus[file-based] menu bar layout.

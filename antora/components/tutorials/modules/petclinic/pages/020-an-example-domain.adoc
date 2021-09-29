@@ -2,7 +2,7 @@
 
 = An Example Domain
 
-By now you should understand the basics of what Apache Isis does, but there's only so much we can learn from a one domain class.
+By now you should understand the basics of what Apache Isis does, but there's only so much we can learn from a single domain class.
 Let's therefore evolve the app into a slightly more interesting domain and explore other features of the framework.
 
 The domain we're going to work on is a version of the venerable "Pet Clinic" app.
@@ -40,7 +40,7 @@ package pets {
     }
 
 
-    class Owner <<role>> {
+    class PetOwner <<role>> {
         +id
         ..
         #lastName
@@ -69,9 +69,9 @@ package visits {
 }
 
 
-Owner *-down-> "0..*" Pet
-Visit "   \n*" -up->  Pet
-Pet  "*" -right--> PetSpecies
+PetOwner *-r--> "0..*" Pet
+Visit "   \n*" -r->  Pet
+Pet  "*" -u-> PetSpecies
 ----
 
 [TIP]
@@ -82,44 +82,49 @@ The colours used are from "Java: Modeling in Color" book by Coad et al.
 
 Some of the use cases we might want to support include:
 
-* create an `Owner`
-* add and remove ``Pet``s for said `Owner`
+* create a `PetOwner`
+* add and remove ``Pet``s for said `PetOwner`
 * book a `Pet` in for a `Visit`
 * enter an `outcome` and `cost` of a `Visit`
-* allow an `Owner` to pay for a `Visit`
+* allow a `PetOwner` to pay for a `Visit`
 * find ``Visit``s not yet paid and overdue
-* delete an `Owner` and its ``Pet``s and ``Visit``s, so long as there are no unpaid ``Visit``s.
+* delete a `PetOwner` and its ``Pet``s and ``Visit``s, so long as there are no unpaid ``Visit``s.
 
 This tutorial has worked solutions for all of these.
 
-== Rename `HelloWorldObject` to `Owner`
+== Exercise 2.1: Refactor `SimpleObject` to `PetOwner`
 
-To start with, let's rename the `HelloWorldObject` entity to `Owner`
-You can either make the changes yourself, or just checkout the next git tag checkpoint
+To start with, let's rename the `SimpleObject` entity to `PetOwner`
 
 === Solution
 
 [source,bash]
 ----
-git checkout tags/020-rename-HelloWorldObject-to-Owner
-mvn clean package jetty:run
+git checkout tags/02-01-renames-SimpleObject-to-PetOwner
+mvn clean install
+mvn -pl spring-boot:run
 ----
 
-=== Exercise
+=== Tasks
 
-* the changes for `HelloWorldObject` entity are:
+Just checkout the solution above and review the git history to see the changes that have already been made.
+These include:
 
-** rename class `HelloWorldObject` -> `Owner`
-** rename file `HelloWorldObject.layout.xml` -> `Owner.layout.xml`
-** rename file `HelloWorldObject.png` -> `Owner.png`
-*** or replace with another more suitable icon
-** rename class `HelloWorldObjectTest_updateName` -> `OwnerTest_updateName`
-** rename class `HelloWorldObjectTest_delete` -> `OwnerTest_delete`
+* Domain classes renamed (along with corresponding tests)
 
-* for the `HelloWorldObjects` domain service:
+** `SimpleObject` entity -> `PetOwner`
+** `SimpleObjects` domain service -> `PetOwners`
+** `SimpleObjectRepository` repository service -> `PetOwnerRepository`
 
-** rename class `HelloWorldObjects` -> `Owners`
-** update file `menubars.layout.xml`
+** Infrastructure classes renamed
+
+** `SimpleModule` -> `PetsModule`
+** `SimpleApp` -> `PetClinicApp`
+
+* the `README.adoc` has been updated and slimmed down
+
+
+
 
 Run the application and make sure it still runs fine.
 
